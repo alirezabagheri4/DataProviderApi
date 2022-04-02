@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DomainModel.DataModel;
 
 namespace Facade
 {
@@ -16,6 +17,6 @@ namespace Facade
 
         Task Update(object id);
 
-        List<Task> AddBatch(List<object> command);
+        List<Task> AddBatch(List<DynamicObjectDO> command);
     }
 }

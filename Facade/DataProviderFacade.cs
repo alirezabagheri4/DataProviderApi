@@ -1,4 +1,7 @@
-﻿using DomainModel.Interface.DataProviderRepository;
+﻿using System.ComponentModel;
+using System.Security.Cryptography.X509Certificates;
+using DomainModel.DataModel;
+using DomainModel.Interface.DataProviderRepository;
 
 namespace Facade
 {
@@ -9,6 +12,18 @@ namespace Facade
         {
             _dataProviderRepository = dataProviderRepository;
         }
+        public List<Task> AddBatch(List<DynamicObjectDO> t)
+        {
+            try
+            {
+                return _dataProviderRepository.AddBach(t);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         public async Task<dynamic> Get(int id)
         {
             Task<dynamic> result;
@@ -42,18 +57,6 @@ namespace Facade
             try
             {
                 return _dataProviderRepository.Add(t);
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
-
-        public List<Task> AddBatch(List<dynamic> t)
-        {
-            try
-            {
-                return _dataProviderRepository.AddBach(t);
             }
             catch (Exception e)
             {

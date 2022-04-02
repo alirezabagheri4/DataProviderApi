@@ -1,4 +1,6 @@
-﻿namespace DomainModel.Interface.DataProviderRepository
+﻿using DomainModel.DataModel;
+
+namespace DomainModel.Interface.DataProviderRepository
 {
     public interface IDataProviderRepository
     {
@@ -10,6 +12,6 @@
 
         Task Update(dynamic id);
 
-        List<Task> AddBach(List<dynamic> t);
+        List<Task> AddBach(List<DynamicObjectDO> t);
     }
 }

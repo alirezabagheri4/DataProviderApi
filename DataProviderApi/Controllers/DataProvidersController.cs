@@ -1,7 +1,13 @@
-﻿using System.Reflection;
+﻿using System.Dynamic;
+using System.Reflection;
+using System.Text.Json.Nodes;
+using AutoMapper;
+using DataProviderApi.Tools;
+using DomainModel.DataModel;
 using Facade;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace DataProviderApi.Controllers
 {
@@ -10,52 +16,21 @@ namespace DataProviderApi.Controllers
     public class DataProvidersController : Controller
     {
         private readonly IDataProviderFacade _providerFacade;
-        public DataProvidersController(IDataProviderFacade dataProviderFacade)
+        private readonly IMapper _mapper;
+        public DataProvidersController(IDataProviderFacade dataProviderFacade, IMapper mapper)
         {
-            _providerFacade= dataProviderFacade;
-        }
-
-        [HttpPost("Add")]
-        public IActionResult Add([FromBody] object json)
-        {
-            try
-            {
-                //var json = jsons.ToString().Trim().TrimStart('{').TrimEnd('}');
-                var dic = new Dictionary<int, Tuple<string?, string?>>();
-                var command = JsonConvert.DeserializeObject(json.ToString());
-                var i = 0;
-                Type myType = command.GetType();
-                IList<PropertyInfo> props = new List<PropertyInfo>(myType.GetProperties());
-
-                foreach (PropertyInfo item in props)
-                {
-                    //object? propValue = prop.GetValue(command, null);
-
-                    var nameOfProperty = i;
-                    i++;
-                    string? propertyInfo = item.GetType().GetProperty(item.Name)?.ToString();
-                    string? value = item.GetValue(command, null)?.ToString();
-                    dic.Add(i, new Tuple<string?, string?>(propertyInfo, value));
-                }
-
-                _providerFacade.Add(command);
-                var result = new OkObjectResult(new { message = "200 OK" });
-                return result;
-            }
-            catch (Exception e)
-            {
-                var result = new BadRequestObjectResult(new { message = e.Message });
-                //log
-                return result;
-            }
+            _mapper = mapper;
+            _providerFacade = dataProviderFacade;
         }
 
         [HttpPost("AddBatch")]
-        public IActionResult Add([FromBody] List<object> command)
+        public IActionResult Add([FromBody] JsonObject command)
         {
             try
             {
-                _providerFacade.AddBatch(command);
+                var propRecord = JsonTools.Convert(command);
+                var value = _mapper.Map<List<DynamicObjectDO>>(propRecord);
+                _providerFacade.AddBatch(value);
                 var result = new OkObjectResult(new { message = "200 OK" });
                 return result;
             }
@@ -91,6 +66,22 @@ namespace DataProviderApi.Controllers
             {
                 var res = _providerFacade.Get(id);
                 var result = new OkObjectResult(new { message = "200 OK", currentDate = res });
+                return result;
+            }
+            catch (Exception e)
+            {
+                var result = new BadRequestObjectResult(new { message = e.Message });
+                //log
+                return result;
+            }
+        }
+
+        [HttpPost("Add")]
+        public IActionResult Add([FromBody] object json)
+        {
+            try
+            {
+                var result = new BadRequestObjectResult(new { message = "در آینده" });
                 return result;
             }
             catch (Exception e)

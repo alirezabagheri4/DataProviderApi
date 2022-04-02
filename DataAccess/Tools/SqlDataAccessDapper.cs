@@ -13,7 +13,7 @@ namespace DataAccess.Tools
             _config = config;
         }
 
-        private const string  ConnectionString = 
+        private const string  ConnectionString =
             "Data Source=DESKTOP-3DPTK00;Initial Catalog=DataProvider;Integrated Security=True;";
         public async Task<IEnumerable<T>> LoadData<T, TU>(
             string storedProcedure,
@@ -30,7 +30,6 @@ namespace DataAccess.Tools
             T parameters)
         {
             using IDbConnection connection = new SqlConnection(ConnectionString);
-
             await connection.ExecuteAsync(storedProcedure, parameters,
                 commandType: CommandType.Text);
         }
