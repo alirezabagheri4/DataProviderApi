@@ -130,6 +130,8 @@ namespace DataAccess.Repository
                     }
                 }
 
+                soton += "[SubmitDate] [datetime2](3) NOT NULL )";
+
                 foreach (var item in record)
                 {
                     insert2 = $"Insert Into {className}";
