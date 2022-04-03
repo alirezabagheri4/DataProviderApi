@@ -29,30 +29,51 @@ namespace DataAccess.Repository
                 AND TABLE_NAME = '{className}'))";
                 string begin = "Begin ";
 
-                string? insrt1 = " "; string? property1 = " "; string? value1 = null;
-
+                string? insert1 = " "; string? property1 = " "; string? value1 = " ";
+                var i = 0; var s = 0; var h = 0;
                 foreach (var item in record)
                 {
-                    insrt1 += $"Insert Into [dbo].[{className}]";
-                    property1 += "(";
-                    foreach (var prop in item.c.ToList())
+                    if (i==0)
                     {
-                        property1 += $"[{prop.PropertyName}],";
+                        insert1 += $"Insert Into [dbo].[{className}]";
+                        property1 += "(";
+                        foreach (var prop in item.c.ToList())
+                        {
+                            property1 += $"[{prop.PropertyName}],";
+                        }
+                        property1 += "[SubmitDate] ) ";
                     }
-                    property1 += "[SubmitDate] ) ";
-                    value1 = "VALUES (";
+                    i++;
+                    if (i==1)
+                    {
+                        value1 += "VALUES (";
+                    }
+                    else if (i>1)
+                    {
+                        value1 += ",(";
+                    }
+                    i++;
+                    var count = item.c.ToList().Count;
                     foreach (var value in item.c.ToList())
                     {
-                        value1 += $" N'{value.PropertyValue}' ,";
+                        if (h == 0 || h % count==0) 
+                        {
+                            value1 += $" {value.PropertyValue} ,";
+                        }
+                        else
+                        {
+                            value1 += $" N'{value.PropertyValue}' ,";
+                        }
+                        h++;
                     }
                     value1 += $" '{DateTime.Now}' ) ";
                 }
-
+                value1 += ";";
                 string endIf = "END ";
                 string elseStr = "ELSE BEGIN ";
                 string? soton = null;
                 string? creatTable = $"CREATE TABLE [dbo].[{className}] (";
-                string? insert2 = ""; string? property2 = ""; string? value2 = null;
+                string? insert2 = " "; string? property2 = ""; string? value2 = " ";
                 foreach (var rec in record)
                 {
                     foreach (var prop in rec.c.ToList())
@@ -73,23 +94,45 @@ namespace DataAccess.Repository
 
                 foreach (var item in record)
                 {
-                    insert2 += $"Insert Into [dbo].[{className}]";
-                    property2 += "(";
-                    foreach (var prop in item.c.ToList())
+                    if (s == 0)
                     {
-                        property2 += $"[{prop.PropertyName}],";
+                        insert2 += $"Insert Into [dbo].[{className}]";
+                        property2 += "(";
+                        foreach (var prop in item.c.ToList())
+                        {
+                            property2 += $"[{prop.PropertyName}],";
+                        }
+                        property2 += "[SubmitDate] )";
                     }
-                    property2 += "[SubmitDate] )";
-                    value2 = "VALUES (";
+                    s++;
+                    if (s == 1)
+                    {
+                        value2 += "VALUES (";
+                    }
+                    else if (s > 1)
+                    {
+                        value2 += ",(";
+                    }
+                    s++;
+                    var count = item.c.ToList().Count;
                     foreach (var value in item.c.ToList())
                     {
-                        value2 += $" N'{value.PropertyValue}' ,";
+                        if (h == 1 || h % count == 0)
+                        {
+                            value2 += $" {value.PropertyValue} ,";
+                        }
+                        else
+                        {
+                            value2 += $" N'{value.PropertyValue}' ,";
+                        }
+                        h++;
                     }
                     value2 += $" '{DateTime.Now}' ) ";
                 }
+                value1 += ";";
                 string endElse = "END ";
                 string query = useDB + ifStatement + begin
-                               + insrt1 + property1 + value1 + endIf +
+                               + insert1 + property1 + value1 + endIf +
                                elseStr + creatTable + soton +
                                insert2 + property2 + value2 + endElse;
 
