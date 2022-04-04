@@ -7,10 +7,7 @@ namespace DataAccess.Repository
     public class DataProviderRepository : IDataProviderRepository
     {
         private readonly ISqlDataAccessDapper _accessDapper;
-        public DataProviderRepository(ISqlDataAccessDapper accessDapper)
-        {
-            _accessDapper = accessDapper;
-        }
+        public DataProviderRepository(ISqlDataAccessDapper accessDapper) => _accessDapper = accessDapper;
 
         public List<Task> AddBach(List<DynamicObjectDO> t)
         {
@@ -21,15 +18,14 @@ namespace DataAccess.Repository
             var result = new List<Task>();
             try
             {
-                string useDB = "use DataProvider ";
-                string ifStatement = $@"
+                const string useDB = "use DataProvider ";
+                var ifStatement = $@"
                 IF (EXISTS (SELECT * 
                 FROM INFORMATION_SCHEMA.TABLES
                 WHERE TABLE_SCHEMA = 'dbo'
                 AND TABLE_NAME = '{className}'))";
-                string begin = "Begin ";
-
-                string? insert1 = " "; string? property1 = " "; string? value1 = " ";
+                var begin = "Begin ";
+                var insert1 = " "; var property1 = " "; var value1 = " ";
                 var i = 0; var s = 0; var h = 0;
                 foreach (var item in record)
                 {
@@ -44,54 +40,45 @@ namespace DataAccess.Repository
                         property1 += "[SubmitDate] ) ";
                     }
                     i++;
-                    if (i==1)
+                    switch (i)
                     {
-                        value1 += "VALUES (";
-                    }
-                    else if (i>1)
-                    {
-                        value1 += ",(";
+                        case 1:
+                            value1 += "VALUES (";
+                            break;
+                        case > 1:
+                            value1 += ",(";
+                            break;
                     }
                     i++;
                     var count = item.c.ToList().Count;
                     foreach (var value in item.c.ToList())
                     {
-                        if (h == 0 || h % count==0) 
-                        {
+                        if (h == 0 || h % count == 0)
                             value1 += $" {value.PropertyValue} ,";
-                        }
                         else
-                        {
                             value1 += $" N'{value.PropertyValue}' ,";
-                        }
                         h++;
                     }
                     value1 += $" '{DateTime.Now}' ) ";
                 }
                 value1 += ";";
-                string endIf = "END ";
-                string elseStr = "ELSE BEGIN ";
+                var endIf = "END ";
+                var elseStr = "ELSE BEGIN ";
                 string? soton = null;
-                string? creatTable = $"CREATE TABLE [dbo].[{className}] (";
-                string? insert2 = " "; string? property2 = ""; string? value2 = " ";
+                var createTable = $"CREATE TABLE [dbo].[{className}] (";
+                var insert2 = " "; var property2 = ""; var value2 = " ";
                 foreach (var rec in record)
                 {
                     foreach (var prop in rec.c.ToList())
                     {
                         if (prop.PropertyName.ToUpper().Equals("ID"))
-                        {
                             soton += "Id INT  PRIMARY KEY ,";
-                        }
                         else
-                        {
                             soton += $"[{prop.PropertyName}] Nvarchar(50) ,";
-                        }
                     }
                     break;
                 }
-
                 soton += "[SubmitDate] [datetime2](3) NOT NULL )";
-
                 foreach (var item in record)
                 {
                     if (s == 0)
@@ -105,42 +92,37 @@ namespace DataAccess.Repository
                         property2 += "[SubmitDate] )";
                     }
                     s++;
-                    if (s == 1)
+                    switch (s)
                     {
-                        value2 += "VALUES (";
-                    }
-                    else if (s > 1)
-                    {
-                        value2 += ",(";
+                        case 1:
+                            value2 += "VALUES (";
+                            break;
+                        case > 1:
+                            value2 += ",(";
+                            break;
                     }
                     s++;
                     var count = item.c.ToList().Count;
                     foreach (var value in item.c.ToList())
                     {
                         if (h == 1 || h % count == 0)
-                        {
                             value2 += $" {value.PropertyValue} ,";
-                        }
                         else
-                        {
                             value2 += $" N'{value.PropertyValue}' ,";
-                        }
                         h++;
                     }
                     value2 += $" '{DateTime.Now}' ) ";
                 }
                 value1 += ";";
-                string endElse = "END ";
-                string query = useDB + ifStatement + begin
-                               + insert1 + property1 + value1 + endIf +
-                               elseStr + creatTable + soton +
-                               insert2 + property2 + value2 + endElse;
-
+                var endElse = "END ";
+                var query = useDB + ifStatement + begin
+                            + insert1 + property1 + value1 + endIf +
+                            elseStr + createTable + soton +
+                            insert2 + property2 + value2 + endElse;
                 foreach (var o in t)
                 {
                     result.Add(_accessDapper.SaveData(query, new { }));
                 }
-
                 return result;
             }
             catch (Exception e)
