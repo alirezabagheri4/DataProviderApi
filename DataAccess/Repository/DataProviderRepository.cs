@@ -114,7 +114,7 @@ namespace DataAccess.Repository
                     value2 += $" '{DateTime.Now}' ) ";
                 }
                 value1 += ";";
-                var endElse = "END ";
+                const string endElse = "END ";
                 var query = useDb + ifStatement + begin
                             + insert1 + property1 + value1 + endIf +
                             elseStr + createTable + soton +
