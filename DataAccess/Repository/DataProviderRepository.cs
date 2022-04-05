@@ -24,7 +24,7 @@ namespace DataAccess.Repository
                 FROM INFORMATION_SCHEMA.TABLES
                 WHERE TABLE_SCHEMA = 'dbo'
                 AND TABLE_NAME = '{className}'))";
-                var begin = "Begin ";
+                const string begin = "Begin ";
                 var insert1 = " "; var property1 = " "; var value1 = " ";
                 var i = 0; var s = 0; var h = 0;
                 foreach (var item in record)
