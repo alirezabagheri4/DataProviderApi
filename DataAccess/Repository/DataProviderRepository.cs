@@ -18,7 +18,7 @@ namespace DataAccess.Repository
             var result = new List<Task>();
             try
             {
-                const string useDB = "use DataProvider ";
+                const string useDb = "use DataProvider ";
                 var ifStatement = $@"
                 IF (EXISTS (SELECT * 
                 FROM INFORMATION_SCHEMA.TABLES
@@ -62,8 +62,8 @@ namespace DataAccess.Repository
                     value1 += $" '{DateTime.Now}' ) ";
                 }
                 value1 += ";";
-                var endIf = "END ";
-                var elseStr = "ELSE BEGIN ";
+                const string endIf = "END ";
+                const string elseStr = "ELSE BEGIN ";
                 string? soton = null;
                 var createTable = $"CREATE TABLE [dbo].[{className}] (";
                 var insert2 = " "; var property2 = ""; var value2 = " ";
@@ -115,7 +115,7 @@ namespace DataAccess.Repository
                 }
                 value1 += ";";
                 var endElse = "END ";
-                var query = useDB + ifStatement + begin
+                var query = useDb + ifStatement + begin
                             + insert1 + property1 + value1 + endIf +
                             elseStr + createTable + soton +
                             insert2 + property2 + value2 + endElse;
